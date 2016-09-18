@@ -1,0 +1,2 @@
+# Szoftverfejlesztes
+Beadandó - CornHub csapat
