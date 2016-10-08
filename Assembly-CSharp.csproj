@@ -45,9 +45,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\CameraLookAt.cs" />
-     <Compile Include="Assets\Scripts\Spin.cs" />
-     <Compile Include="Assets\Scripts\WebCam.cs" />
+     <Compile Include="Assets\Scripts\Gps.cs" />
+     <Compile Include="Assets\Scripts\PluginScript.cs" />
+     <None Include="Assets\Plugins\help.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
