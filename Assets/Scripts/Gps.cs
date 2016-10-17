@@ -7,6 +7,15 @@ public class Gps : MonoBehaviour {
 	public Text tx;
 	private int counter = 0;
 
+	public float lat = 47.1257137f;
+	public float lon = 17.7671641f;
+	private Vector2 touchPos;
+	public int zoom, size;
+	public string key;
+
+	public float roationSpeed;
+	public Material material;
+
 	// Use this for initialization
 	IEnumerator Start () {
 		// First, check if user has location service enabled
@@ -38,16 +47,16 @@ public class Gps : MonoBehaviour {
 		// Access granted and location value could be retrieved
 		else{
 			counter++;
-			float lat = Input.location.lastData.latitude;
-			float lon = Input.location.lastData.longitude;
+			lat = Input.location.lastData.latitude;
+			lon = Input.location.lastData.longitude;
 			tx.text = "times: " + counter + " lat: " + lat + " lon: " + lon;
 		}
 		// Stop service if there is no need to query location updates continuously
 		Input.location.Stop();
+		StartCoroutine ("loadTile");
 	}
 
 	public IEnumerator getLocation(){
-
 		// First, check if user has location service enabled
 		if (!Input.location.isEnabledByUser)
 		{
@@ -85,7 +94,40 @@ public class Gps : MonoBehaviour {
 		Input.location.Stop();
 	}
 
-	public void what(){
+	public void updateLocation(){
 		StartCoroutine ("getLocation");
+		StartCoroutine ("loadTile");
+	}
+
+	public IEnumerator loadTile(){
+		if (lat == 0.0f && lon == 0.0f) {
+			lat = 47.0881783f;
+			lon = 17.9077427f;
+		}
+		string url = "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lon+"&zoom="+zoom+"&size="+size+"x"+size+"&maptype=roadmap&key=";
+
+		WWW www = new WWW (url+key);
+		yield return www;
+
+		Texture texture = www.texture;
+		transform.GetComponent<Renderer>().material = material;
+		transform.GetComponent<Renderer>().material.mainTexture = texture;		
+	}
+
+
+	public void touchDown(){
+		touchPos = Input.GetTouch (0).position;
+	}
+
+	public void touchUp(){
+		float swipeForce = touchPos.x - Input.GetTouch (0).position.x;
+		if (Mathf.Abs (swipeForce) > 100) {
+			if(swipeForce < 0)
+				transform.Rotate (Vector3.up, swipeForce * roationSpeed * Mathf.Deg2Rad);
+			else
+				transform.Rotate (Vector3.up, swipeForce * roationSpeed * Mathf.Deg2Rad);
+
+		}
+		
 	}
 }
