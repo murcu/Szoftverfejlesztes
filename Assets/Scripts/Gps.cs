@@ -25,7 +25,7 @@ public class Gps : MonoBehaviour {
 		}
 
 		// Start service before querying location
-		Input.location.Start();
+		Input.location.Start(2.0f, 1.0f);
 
 		// Wait until service initializes
 		int maxWait = 20;
@@ -52,7 +52,7 @@ public class Gps : MonoBehaviour {
 			tx.text = "times: " + counter + " lat: " + lat + " lon: " + lon;
 		}
 		// Stop service if there is no need to query location updates continuously
-		Input.location.Stop();
+		//Input.location.Stop();
 		StartCoroutine ("loadTile");
 	}
 
@@ -113,21 +113,5 @@ public class Gps : MonoBehaviour {
 		transform.GetComponent<Renderer>().material = material;
 		transform.GetComponent<Renderer>().material.mainTexture = texture;		
 	}
-
-
-	public void touchDown(){
-		touchPos = Input.GetTouch (0).position;
-	}
-
-	public void touchUp(){
-		float swipeForce = touchPos.x - Input.GetTouch (0).position.x;
-		if (Mathf.Abs (swipeForce) > 100) {
-			if(swipeForce < 0)
-				transform.Rotate (Vector3.up, swipeForce * roationSpeed * Mathf.Deg2Rad);
-			else
-				transform.Rotate (Vector3.up, swipeForce * roationSpeed * Mathf.Deg2Rad);
-
-		}
 		
-	}
 }

@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\Dungeon.cs" />
      <Compile Include="Assets\Scripts\Gps.cs" />
      <Compile Include="Assets\Scripts\InputManager.cs" />
+     <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\PluginScript.cs" />
      <Compile Include="Assets\Scripts\StartScript.cs" />
      <None Include="Assets\Plugins\help.txt" />

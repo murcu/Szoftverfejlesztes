@@ -3,18 +3,19 @@ using System.Collections;
 
 public class CameraFollow : MonoBehaviour {
 
-	public Transform target;
+	public Transform player;
+	public Vector3 offset;
 
-	private Vector3 offset;
+	private Transform target;
 
 	// Use this for initialization
 	void Start () {
-		offset = transform.position - target.position;
+		target = player;
+		transform.position = target.position + offset;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = target.position + offset;
 		transform.LookAt (target);
 	}
 }
