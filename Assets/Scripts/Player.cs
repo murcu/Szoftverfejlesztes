@@ -3,13 +3,23 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
+	public float easting;
+	public float northing;
+
+	void Start(){
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	void Update(){
+		transform.position = new Vector3 (easting, transform.position.y, northing);
+	}
+
+	public void setEasting(float easting){
+		Debug.Log ("easting set");
+		this.easting = easting;
+	}
+
+	public void setNorthing(float northing){
+		Debug.Log ("northing set");
+		this.northing = northing;
 	}
 }

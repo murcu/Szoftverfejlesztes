@@ -6,12 +6,13 @@ using Random = UnityEngine.Random;
 
 public class Dungeon : MonoBehaviour {
 
-	public string text;
-	public Color textColor;
-	public Color fieldColor;
+	public float easting;
+	public float northing;
 
 	void Start(){
-
 	}
 
+	void Update(){
+	}
+		
 }
