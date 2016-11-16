@@ -14,9 +14,8 @@ public class Gps : MonoBehaviour {
 
 	public float roationSpeed;
 
-	private int counter = 0;
-	private float lat_old, lon_old;
 	private float lat_new, lon_new;
+	private float lat_old, lon_old;
 
 	private float easting;
 	private float northing;
@@ -55,35 +54,46 @@ public class Gps : MonoBehaviour {
 		else{
 			lat_new = Input.location.lastData.latitude;
 			lon_new = Input.location.lastData.longitude;
+			if(lat_new == 0 && lon_new == 0){
+				lat_new = lat;
+				lon_new = lon;
+			}
 		}
+		StartCoroutine ("loadTile");
 	}
 
 	void Update(){
 		tx.text = lat_new + " " + lon_new;
+
+		lat_old = lat_new;
+		lon_old = lon_new;
+		convertLatLonToUTM (lat_old, lon_old);
+		GameObject.Find ("Dungeon").gameObject.GetComponent<Dungeon> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Player").gameObject.GetComponent<Player> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Player").gameObject.GetComponent<Player> ().updateUTM (easting, northing);
 	}
 
 	public IEnumerator loadTile(){
-		string url = "https://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lon+"&zoom="+zoom+"&size="+size+"x"+size+"&maptype=roadmap&key=";
+		string url = "https://maps.googleapis.com/maps/api/staticmap?center="+lat_new+","+lon_new+"&zoom="+zoom+"&size="+size+"x"+size+"&maptype=roadmap&key=";
 
 		WWW www = new WWW (url+key);
 		yield return www;
 		Texture texture = www.texture;
 		transform.GetComponent<Renderer>().material = material;
 		transform.GetComponent<Renderer>().material.mainTexture = texture;
-		Debug.Log ("map loaded");
+
+		convertLatLonToUTM (lat_new, lon_new);
+		northing_offset = northing;
+		easting_offset = easting;
+		Debug.Log ("GPS " + easting_offset + " " + northing_offset);
 	}
 
-	public void updateLocation(){
-		lat_new = lat;
-		lon_new = lon;
-	}
+	public void convertLatLonToUTM(float lat, float lon){
+		int zone = (int) Mathf.Floor(lon/6+31);
 
-	public void convertLatLonToUTM(){
-		int zone = (int) Mathf.Floor(lon_old/6+31);
-
-		easting = 0.5f*Mathf.Log((1f+Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin(lon_old*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin(lon_old*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))*0.9996f*6399593.62f/Mathf.Pow((1f+Mathf.Pow(0.0820944379f, 2f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f), 2f)), 0.5f)*(1f+ Mathf.Pow(0.0820944379f,2f)/2f*Mathf.Pow((0.5f*Mathf.Log((1f+Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin(lon_old*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin(lon_old*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f)/3f)+500000f;
+		easting = 0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))*0.9996f*6399593.62f/Mathf.Pow((1f+Mathf.Pow(0.0820944379f, 2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f), 2f)), 0.5f)*(1f+ Mathf.Pow(0.0820944379f,2f)/2f*Mathf.Pow((0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f)/3f)+500000f;
 		easting = (float)Mathf.Round(easting*100f)*0.01f;
-		northing = (Mathf.Atan(Mathf.Tan(lat_old*Mathf.PI/180f)/Mathf.Cos((lon_old*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))-lat_old*Mathf.PI/180f)*0.9996f*6399593.625f/Mathf.Sqrt(1f+0.006739496742f*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f))*(1f+0.006739496742f/2f*Mathf.Pow(0.5f*Mathf.Log((1f+Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin((lon_old*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))/(1f-Mathf.Cos(lat_old*Mathf.PI/180f)*Mathf.Sin((lon_old*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f))+0.9996f*6399593.625f*(lat_old*Mathf.PI/180f-0.005054622556f*(lat_old*Mathf.PI/180f+Mathf.Sin(2f*lat_old*Mathf.PI/180f)/2f)+4.258201531e-05f*(3f*(lat_old*Mathf.PI/180f+Mathf.Sin(2f*lat_old*Mathf.PI/180f)/2f)+Mathf.Sin(2f*lat_old*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f))/4f-1.674057895e-07f*(5f*(3f*(lat_old*Mathf.PI/180f+Mathf.Sin(2f*lat_old*Mathf.PI/180f)/2f)+Mathf.Sin(2f*lat_old*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f))/4f+Mathf.Sin(2f*lat_old*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f)*Mathf.Pow(Mathf.Cos(lat_old*Mathf.PI/180f),2f))/3f);
+		northing = (Mathf.Atan(Mathf.Tan(lat*Mathf.PI/180f)/Mathf.Cos((lon*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))-lat*Mathf.PI/180f)*0.9996f*6399593.625f/Mathf.Sqrt(1f+0.006739496742f*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f))*(1f+0.006739496742f/2f*Mathf.Pow(0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin((lon*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin((lon*Mathf.PI/180f-(6f*zone -183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f))+0.9996f*6399593.625f*(lat*Mathf.PI/180f-0.005054622556f*(lat*Mathf.PI/180f+Mathf.Sin(2f*lat*Mathf.PI/180f)/2f)+4.258201531e-05f*(3f*(lat*Mathf.PI/180f+Mathf.Sin(2f*lat*Mathf.PI/180f)/2f)+Mathf.Sin(2f*lat*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f))/4f-1.674057895e-07f*(5f*(3f*(lat*Mathf.PI/180f+Mathf.Sin(2f*lat*Mathf.PI/180f)/2f)+Mathf.Sin(2f*lat*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f))/4f+Mathf.Sin(2f*lat*Mathf.PI/180f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f))/3f);
 		northing = (float)Mathf.Round(northing*100f)*0.01f;
 	}
 

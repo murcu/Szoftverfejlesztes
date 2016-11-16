@@ -26,7 +26,7 @@ public class InputManager : MonoBehaviour {
 
 					if(swipeDist > minSwipeDist){
 						float swipeSign = Mathf.Sign (touch.position.x - swipeStartPos.x) * -1f;
-						GameObject.Find ("World").transform.Rotate (Vector3.up, swipeSign*roatationSpeed*Time.deltaTime, Space.World);
+						GameObject.Find ("World").transform.Rotate (Vector3.up, swipeSign*roatationSpeed*Time.deltaTime, Space.Self);
 					}
 				}
 			}
