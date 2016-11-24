@@ -20,9 +20,11 @@ public class Player : MonoBehaviour {
 	public void updateUTM(float e, float n){
 		easting = e;
 		northing = n;
-
 		Vector3 pos = new Vector3 (-(easting_offset-easting), transform.position.y, -(northing_offset - northing));
-		transform.position = pos;
+
+		if (pos != transform.position) {
+			transform.position = Vector3.Lerp (transform.position, pos, Time.deltaTime*20f);
+		}
 	}
 
 	void Update(){		

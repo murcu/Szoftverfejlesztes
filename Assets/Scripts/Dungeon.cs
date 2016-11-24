@@ -6,17 +6,35 @@ using Random = UnityEngine.Random;
 
 public class Dungeon : MonoBehaviour {
 
-	public float lat;
-	public float lon;
+	private DungeonData data;
+	private float lat;
+	private float lon;
 
-	public float easting;
-	public float northing;
+	private float easting;
+	private float northing;
 
-	public float easting_offset;
-	public float northing_offset;
+	private float easting_offset;
+	private float northing_offset;
 
-	void Start(){
-		convertLatLonToUTM ();
+	void Start(){		
+	}
+
+	void Update(){
+	}
+
+	public void setData(DungeonData d){
+		data = d;
+		convertLatLonToUTM (data.lat, data.lon);
+		init ();
+	}
+
+	private void init(){
+		for (int i = 0; i < data.difficulty; i++) {
+			GameObject dif = GameObject.CreatePrimitive (PrimitiveType.Plane);
+			dif.transform.parent = transform;
+			dif.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
+			dif.transform.position = transform.position + new Vector3 (6.0f*i, 1.0f, 10f);
+		}
 	}
 
 	public void setOffset(float e, float n){
@@ -27,7 +45,7 @@ public class Dungeon : MonoBehaviour {
 		transform.position = pos;
 	}
 
-	public void convertLatLonToUTM(){
+	void convertLatLonToUTM(float lat, float lon){
 		int zone = (int) Mathf.Floor(lon/6+31);
 
 		easting = 0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))*0.9996f*6399593.62f/Mathf.Pow((1f+Mathf.Pow(0.0820944379f, 2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f), 2f)), 0.5f)*(1f+ Mathf.Pow(0.0820944379f,2f)/2f*Mathf.Pow((0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f)/3f)+500000f;
@@ -36,7 +54,13 @@ public class Dungeon : MonoBehaviour {
 		northing = (float)Mathf.Round(northing*100f)*0.01f;
 	}
 
-	void Update(){
+	void openMessage(){
+		Debug.Log (data.dungeonName + " touched");
+		buildDungeon ();
 	}
+
+	void buildDungeon(){
 		
+	}
+
 }

@@ -3,8 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class Gps : MonoBehaviour {
-
-	public Text tx;
+	
 	public Material material;
 
 	public float lat;
@@ -15,7 +14,9 @@ public class Gps : MonoBehaviour {
 	public float roationSpeed;
 
 	private float lat_new, lon_new;
-	private float lat_old, lon_old;
+
+	private const float EARTH_RADIOUS = 6317f;
+	private float distance;
 
 	private float easting;
 	private float northing;
@@ -23,57 +24,58 @@ public class Gps : MonoBehaviour {
 	public float easting_offset;
 	public float northing_offset;
 
+	private bool isEnabled = false;
+
 	// Use this for initialization
 	IEnumerator Start () {
-		// First, check if user has location service enabled
-		if (!Input.location.isEnabledByUser){
-			tx.text = "not enabled...";
-		}
-
-		// Start service before querying location
-		Input.location.Start(2.0f, 1.0f);
-
-		// Wait until service initializes
-		int maxWait = 20;
-		tx.text = "waiting...";
-		while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0) {
-			yield return new WaitForSeconds(1);
-			maxWait--;
-		}
-
-		// Service didn't initialize in 20 seconds
-		if (maxWait < 1) {
-			tx.text = "init time out...";
-		}
-
-		// Connection has failed
-		if (Input.location.status == LocationServiceStatus.Failed) {
-			tx.text = "service failed...";
-		}
-		// Access granted and location value could be retrieved
-		else{
-			lat_new = Input.location.lastData.latitude;
-			lon_new = Input.location.lastData.longitude;
-			if(lat_new == 0 && lon_new == 0){
-				lat_new = lat;
-				lon_new = lon;
+		distance = 0f;
+		if (!Input.location.isEnabledByUser) {
+			lat_new = 47.08949f;
+			lon_new = 17.9079f;
+		}else{
+			Input.location.Start(5f, 5f);
+			Debug.Log ("is enabeld");
+			int maxWait = 15;
+			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0) {
+				yield return new WaitForSeconds(1);
+				maxWait--;
+			}
+			if (maxWait == 1) {
+			}else if (Input.location.status == LocationServiceStatus.Failed) {
+			}else{
+				isEnabled = true;
+				lat_new = Input.location.lastData.latitude;
+				lon_new = Input.location.lastData.longitude;
 			}
 		}
+			
+		convertLatLonToUTM (lat_new, lon_new);
+		northing_offset = northing;
+		easting_offset = easting;
 		StartCoroutine ("loadTile");
+		GameObject.Find ("Dungeon Manager").gameObject.GetComponent<DungeonManager> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Player").gameObject.GetComponent<Player> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Dungeon Manager").gameObject.GetComponent<DungeonManager> ().init ();
 	}
 
 	void Update(){
-		tx.text = lat_new + " " + lon_new;
+		if (isEnabled) {			
+			float deltaDistance = Harversine (lat_new, lon_new) * 1000f;
+			if(deltaDistance > 0f){
+				distance += deltaDistance;
+			}
 
-		lat_old = lat_new;
-		lon_old = lon_new;
-		convertLatLonToUTM (lat_old, lon_old);
-		GameObject.Find ("Dungeon").gameObject.GetComponent<Dungeon> ().setOffset (easting_offset, northing_offset);
-		GameObject.Find ("Player").gameObject.GetComponent<Player> ().setOffset (easting_offset, northing_offset);
-		GameObject.Find ("Player").gameObject.GetComponent<Player> ().updateUTM (easting, northing);
+			convertLatLonToUTM (lat_new, lon_new);
+			GameObject.Find ("Player").gameObject.GetComponent<Player> ().updateUTM (easting, northing);
+		}
 	}
 
-	public IEnumerator loadTile(){
+	public void changeLatLon(){
+		lat_new = Input.location.lastData.latitude;
+		lon_new = Input.location.lastData.longitude;
+	}
+
+	IEnumerator loadTile(){
 		string url = "https://maps.googleapis.com/maps/api/staticmap?center="+lat_new+","+lon_new+"&zoom="+zoom+"&size="+size+"x"+size+"&maptype=roadmap&key=";
 
 		WWW www = new WWW (url+key);
@@ -81,14 +83,9 @@ public class Gps : MonoBehaviour {
 		Texture texture = www.texture;
 		transform.GetComponent<Renderer>().material = material;
 		transform.GetComponent<Renderer>().material.mainTexture = texture;
-
-		convertLatLonToUTM (lat_new, lon_new);
-		northing_offset = northing;
-		easting_offset = easting;
-		Debug.Log ("GPS " + easting_offset + " " + northing_offset);
 	}
 
-	public void convertLatLonToUTM(float lat, float lon){
+	void convertLatLonToUTM(float lat, float lon){
 		int zone = (int) Mathf.Floor(lon/6+31);
 
 		easting = 0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))*0.9996f*6399593.62f/Mathf.Pow((1f+Mathf.Pow(0.0820944379f, 2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f), 2f)), 0.5f)*(1f+ Mathf.Pow(0.0820944379f,2f)/2f*Mathf.Pow((0.5f*Mathf.Log((1f+Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f))/(1f-Mathf.Cos(lat*Mathf.PI/180f)*Mathf.Sin(lon*Mathf.PI/180f-(6f*zone-183f)*Mathf.PI/180f)))),2f)*Mathf.Pow(Mathf.Cos(lat*Mathf.PI/180f),2f)/3f)+500000f;
@@ -97,5 +94,18 @@ public class Gps : MonoBehaviour {
 		northing = (float)Mathf.Round(northing*100f)*0.01f;
 	}
 
+	float Harversine(float lat_old, float lon_old){
+		lat_new = Input.location.lastData.latitude;
+		lon_new = Input.location.lastData.longitude;
 
+		float deltaLatitude = (lat_new - lat_old) * Mathf.Deg2Rad;
+		float deltaLongitude = (lon_new - lon_old) * Mathf.Deg2Rad;
+
+		float a = Mathf.Pow (Mathf.Sin (deltaLatitude / 2), 2) + Mathf.Cos (lat_old * Mathf.Deg2Rad) * Mathf.Cos(lat_new * Mathf.Deg2Rad) * Mathf.Pow(Mathf.Sin(deltaLongitude/2), 2);
+
+
+
+		float c = 2 * Mathf.Atan2 (Mathf.Sqrt(a), Mathf.Sqrt(1-a));
+		return EARTH_RADIOUS * c;
+	}
 }

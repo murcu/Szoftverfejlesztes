@@ -28,8 +28,12 @@ public class CameraController : MonoBehaviour {
 
 				if (swipDistance > minSwipeDist) {
 					Vector2 vec = endPos - startPos;
-					Debug.Log (vec);
-					transform.position = Vector3.Lerp (transform.position, new Vector3 (vec.x, 0f, vec.y) * -1f, Time.deltaTime);
+					Vector3 pos = new Vector3 (
+						Mathf.Clamp(vec.x, -200f, 200f),
+						0f,
+						Mathf.Clamp(vec.y, -200f, 200f)
+					);
+					transform.position = Vector3.Lerp (transform.position, pos, Time.deltaTime);
 				}
 			}
 		}else if (Input.touchCount == 2) {
@@ -44,14 +48,18 @@ public class CameraController : MonoBehaviour {
 
 			float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
-
 			if (cameraMain.orthographic) {
 				cameraMain.orthographicSize += deltaMagnitudeDiff * 0.5f;
 				cameraMain.orthographicSize = Mathf.Max (cameraMain.orthographicSize, 50f);
 			} else {
 				cameraMain.fieldOfView += deltaMagnitudeDiff * 0.5f;
-				cameraMain.fieldOfView = Mathf.Clamp (GameObject.Find ("Camera").GetComponent<Camera> ().fieldOfView, 60f, 100.0f);
+				cameraMain.fieldOfView = Mathf.Clamp (GameObject.Find ("Camera").GetComponent<Camera> ().fieldOfView, 60f, 75f);
 			}
 		}
+	}
+
+	public void cameraToPlayer(){
+		Transform player = GameObject.Find ("Player").transform;
+		transform.position = new Vector3 (player.position.x, 0f, player.position.z);
 	}
 }
