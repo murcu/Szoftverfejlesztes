@@ -3,8 +3,11 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement;
 
 public class Dungeon : MonoBehaviour {
+
+	public bool open = false;
 
 	private DungeonData data;
 	private float lat;
@@ -20,12 +23,17 @@ public class Dungeon : MonoBehaviour {
 	}
 
 	void Update(){
+		//show if the dungeon is interactable or not
+		if (open) {
+			transform.GetComponent<Renderer> ().material.color = new Color (0f, 1f, 0f);
+		} else {
+			transform.GetComponent<Renderer> ().material.color = new Color (0f, 0f, 1f);
+		}
 	}
 
 	public void setData(DungeonData d){
 		data = d;
 		convertLatLonToUTM (data.lat, data.lon);
-		init ();
 	}
 
 	private void init(){
@@ -55,12 +63,14 @@ public class Dungeon : MonoBehaviour {
 	}
 
 	void openMessage(){
-		Debug.Log (data.dungeonName + " touched");
-		buildDungeon ();
+		if (open) {
+			Debug.Log (data.dungeonName + " touched");
+			data.inProgress = true;
+			SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex + 1);
+		}
 	}
 
-	void buildDungeon(){
+	public void completeDungeon(){
 		
 	}
-
 }

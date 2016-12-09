@@ -6,6 +6,8 @@ public class DungeonData : ScriptableObject {
 	public string dungeonName = "myDungeon";
 	public float lat = 0f;
 	public float lon = 0f;
+
 	public int difficulty = 1;
+	public bool inProgress = false;
 	public bool completed = false;
 }

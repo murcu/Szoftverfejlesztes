@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.IO;
 
 public class Gps : MonoBehaviour {
 	
@@ -30,11 +31,9 @@ public class Gps : MonoBehaviour {
 	IEnumerator Start () {
 		distance = 0f;
 		if (!Input.location.isEnabledByUser) {
-			lat_new = 47.08949f;
-			lon_new = 17.9079f;
+			Debug.Log ("not enabled");
 		}else{
 			Input.location.Start(5f, 5f);
-			Debug.Log ("is enabeld");
 			int maxWait = 15;
 			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0) {
 				yield return new WaitForSeconds(1);
@@ -46,6 +45,10 @@ public class Gps : MonoBehaviour {
 				isEnabled = true;
 				lat_new = Input.location.lastData.latitude;
 				lon_new = Input.location.lastData.longitude;
+				if (lat_new == 0f && lon_new == 0f) {
+					lat_new = lat;
+					lon_new = lon;
+				}
 			}
 		}
 			
@@ -80,7 +83,8 @@ public class Gps : MonoBehaviour {
 
 		WWW www = new WWW (url+key);
 		yield return www;
-		Texture texture = www.texture;
+		Texture2D texture = www.texture;
+		//save the texture!
 		transform.GetComponent<Renderer>().material = material;
 		transform.GetComponent<Renderer>().material.mainTexture = texture;
 	}
@@ -103,9 +107,12 @@ public class Gps : MonoBehaviour {
 
 		float a = Mathf.Pow (Mathf.Sin (deltaLatitude / 2), 2) + Mathf.Cos (lat_old * Mathf.Deg2Rad) * Mathf.Cos(lat_new * Mathf.Deg2Rad) * Mathf.Pow(Mathf.Sin(deltaLongitude/2), 2);
 
-
-
 		float c = 2 * Mathf.Atan2 (Mathf.Sqrt(a), Mathf.Sqrt(1-a));
 		return EARTH_RADIOUS * c;
+	}
+
+	public void updateLoc(){
+		lat_new = Input.location.lastData.latitude;
+		lon_new = Input.location.lastData.longitude;
 	}
 }

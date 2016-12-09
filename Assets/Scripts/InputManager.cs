@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class InputManager : MonoBehaviour {
 
@@ -27,6 +28,9 @@ public class InputManager : MonoBehaviour {
 				}
 			}
 		}
+	}
 
+	public void completeDungeon(){		
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex - 1);
 	}
 }

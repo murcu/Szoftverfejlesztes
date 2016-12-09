@@ -3,17 +3,33 @@ using System.Collections;
 
 public class DungeonManager : MonoBehaviour {
 
+	public Transform player;
+	public float dungeonOpenDistance;
 	public GameObject dungeonPrefab;
-	public DungeonData[] dungeons;
+	private DungeonData[] dungeons;
 
 	private float easting_offset;
 	private float northing_offset;
 
 	// Use this for initialization
-	void Start () {
+	void Start () {		
+	}
+
+	void Update(){
+		for (int i = 0; i < transform.childCount; i++) {
+			Transform child = transform.GetChild (i);
+			float distance = Vector3.Distance (player.position, child.position);
+			if (distance < dungeonOpenDistance) {
+				Debug.Log (child.name);
+				child.GetComponent<Dungeon> ().open = true;
+			} else {
+				child.GetComponent<Dungeon> ().open = false;
+			}
+		}
 	}
 
 	public void init(){
+		dungeons = GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().dungeons;
 		for (int i = 0; i < dungeons.Length; i++) {
 			if (!dungeons [i].completed) {
 				GameObject obj = Instantiate (dungeonPrefab);

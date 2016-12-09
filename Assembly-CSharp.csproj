@@ -45,14 +45,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ActionCam.cs" />
+     <Compile Include="Assets\Scripts\ActiveDungeon.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
-     <Compile Include="Assets\Scripts\CharecterData.cs" />
+     <Compile Include="Assets\Scripts\CharacterData.cs" />
+     <Compile Include="Assets\Scripts\DataManager.cs" />
      <Compile Include="Assets\Scripts\Dungeon.cs" />
      <Compile Include="Assets\Scripts\DungeonData.cs" />
      <Compile Include="Assets\Scripts\DungeonManager.cs" />
+     <Compile Include="Assets\Scripts\EnemySpawner.cs" />
      <Compile Include="Assets\Scripts\Gps.cs" />
      <Compile Include="Assets\Scripts\InputManager.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\Room.cs" />
      <Compile Include="Assets\Scripts\StartScript.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
