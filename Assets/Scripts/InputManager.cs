@@ -21,16 +21,10 @@ public class InputManager : MonoBehaviour {
 			if(Physics.Raycast(ray, out hit, mask)){
 				GameObject recipent = hit.transform.gameObject;
 
-				if(touch.phase == TouchPhase.Began){
-					recipent.SendMessage("openMessage", hit.point, SendMessageOptions.DontRequireReceiver);
-				}
 				if(touch.phase == TouchPhase.Ended){
+					recipent.SendMessage("openMessage", hit.point, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 		}
-	}
-
-	public void completeDungeon(){		
-		SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex - 1);
 	}
 }

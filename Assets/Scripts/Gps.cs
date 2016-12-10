@@ -32,6 +32,9 @@ public class Gps : MonoBehaviour {
 		distance = 0f;
 		if (!Input.location.isEnabledByUser) {
 			Debug.Log ("not enabled");
+
+			lat_new = lat;
+			lon_new = lon;
 		}else{
 			Input.location.Start(5f, 5f);
 			int maxWait = 15;
@@ -41,6 +44,7 @@ public class Gps : MonoBehaviour {
 			}
 			if (maxWait == 1) {
 			}else if (Input.location.status == LocationServiceStatus.Failed) {
+				Debug.Log ("failed");
 			}else{
 				isEnabled = true;
 				lat_new = Input.location.lastData.latitude;
@@ -51,14 +55,18 @@ public class Gps : MonoBehaviour {
 				}
 			}
 		}
-			
+
 		convertLatLonToUTM (lat_new, lon_new);
+
 		northing_offset = northing;
 		easting_offset = easting;
+
 		StartCoroutine ("loadTile");
-		GameObject.Find ("Dungeon Manager").gameObject.GetComponent<DungeonManager> ().setOffset (easting_offset, northing_offset);
-		GameObject.Find ("Player").gameObject.GetComponent<Player> ().setOffset (easting_offset, northing_offset);
-		GameObject.Find ("Dungeon Manager").gameObject.GetComponent<DungeonManager> ().init ();
+		GameObject.Find ("Dungeon Manager").GetComponent<DungeonManager> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Player").GetComponent<Player> ().setOffset (easting_offset, northing_offset);
+		GameObject.Find ("Player").GetComponent<Player> ().updateUTM (easting, northing);
+
+		GameObject.Find ("Dungeon Manager").GetComponent<DungeonManager> ().init ();
 	}
 
 	void Update(){
@@ -69,7 +77,7 @@ public class Gps : MonoBehaviour {
 			}
 
 			convertLatLonToUTM (lat_new, lon_new);
-			GameObject.Find ("Player").gameObject.GetComponent<Player> ().updateUTM (easting, northing);
+			//GameObject.Find ("Player").gameObject.GetComponent<Player> ().updateUTM (easting, northing);
 		}
 	}
 
@@ -89,6 +97,7 @@ public class Gps : MonoBehaviour {
 		transform.GetComponent<Renderer>().material.mainTexture = texture;
 	}
 
+	//http://stackoverflow.com/questions/176137/java-convert-lat-lon-to-utm
 	void convertLatLonToUTM(float lat, float lon){
 		int zone = (int) Mathf.Floor(lon/6+31);
 

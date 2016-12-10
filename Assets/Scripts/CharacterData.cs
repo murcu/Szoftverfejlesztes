@@ -5,10 +5,13 @@ using System.Collections;
 public class CharacterData : ScriptableObject {
 
 	public string characterName;
+	public GameObject characterPrefab;
+
 	public int maxHealth;
 	public int currHealth;
 
 	public int strenght;
 	public int agility;
 	public int intellect;
+
 }

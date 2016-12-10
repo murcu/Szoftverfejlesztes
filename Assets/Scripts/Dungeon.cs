@@ -36,15 +36,6 @@ public class Dungeon : MonoBehaviour {
 		convertLatLonToUTM (data.lat, data.lon);
 	}
 
-	private void init(){
-		for (int i = 0; i < data.difficulty; i++) {
-			GameObject dif = GameObject.CreatePrimitive (PrimitiveType.Plane);
-			dif.transform.parent = transform;
-			dif.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
-			dif.transform.position = transform.position + new Vector3 (6.0f*i, 1.0f, 10f);
-		}
-	}
-
 	public void setOffset(float e, float n){
 		easting_offset = e;
 		northing_offset = n;
@@ -64,13 +55,8 @@ public class Dungeon : MonoBehaviour {
 
 	void openMessage(){
 		if (open) {
-			Debug.Log (data.dungeonName + " touched");
 			data.inProgress = true;
 			SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex + 1);
 		}
-	}
-
-	public void completeDungeon(){
-		
 	}
 }

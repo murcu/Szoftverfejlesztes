@@ -13,6 +13,8 @@ public class CameraController : MonoBehaviour {
 
 	void Start(){
 		cameraMain = GameObject.Find ("Camera").GetComponent<Camera> ();
+		Transform player = GameObject.Find ("Player").transform;
+		transform.position = new Vector3 (player.position.x, 0f, player.position.z);
 	}
 
 	void Update () {

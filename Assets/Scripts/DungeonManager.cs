@@ -4,6 +4,8 @@ using System.Collections;
 public class DungeonManager : MonoBehaviour {
 
 	public Transform player;
+
+	[Range(0f, 500f)]
 	public float dungeonOpenDistance;
 	public GameObject dungeonPrefab;
 	private DungeonData[] dungeons;
@@ -19,8 +21,8 @@ public class DungeonManager : MonoBehaviour {
 		for (int i = 0; i < transform.childCount; i++) {
 			Transform child = transform.GetChild (i);
 			float distance = Vector3.Distance (player.position, child.position);
+
 			if (distance < dungeonOpenDistance) {
-				Debug.Log (child.name);
 				child.GetComponent<Dungeon> ().open = true;
 			} else {
 				child.GetComponent<Dungeon> ().open = false;

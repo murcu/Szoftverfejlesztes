@@ -24,18 +24,16 @@ public class Player : MonoBehaviour {
 		northing_offset = n;
 	}
 
+	//move the player in MapView
 	public void updateUTM(float e, float n){
 		easting = e;
 		northing = n;
-		Vector3 pos = new Vector3 (-(easting_offset-easting), transform.position.y, -(northing_offset - northing));
 
-		if (pos != transform.position) {
-			//move and play animation
-			transform.position = Vector3.Lerp (transform.position, pos, Time.deltaTime*20f);
-		}
+		//move and animate
+		Vector3 pos = new Vector3 (-(easting_offset-easting), transform.position.y, -(northing_offset - northing));
+		transform.position = pos;
 	}
 
 	void Update(){		
-	}
-		
+	}		
 }
