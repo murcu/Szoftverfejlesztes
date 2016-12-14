@@ -87,14 +87,27 @@ public class Gps : MonoBehaviour {
 	}
 
 	IEnumerator loadTile(){
-		string url = "https://maps.googleapis.com/maps/api/staticmap?center="+lat_new+","+lon_new+"&zoom="+zoom+"&size="+size+"x"+size+"&maptype=roadmap&key=";
+		if (GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().map == null) {
+			string url = "https://maps.googleapis.com/maps/api/staticmap?center=" + lat_new + "," + lon_new + "&zoom=" + zoom + "&size=" + size + "x" + size + "&maptype=roadmap&key=";
 
-		WWW www = new WWW (url+key);
-		yield return www;
-		Texture2D texture = www.texture;
-		//save the texture!
-		transform.GetComponent<Renderer>().material = material;
-		transform.GetComponent<Renderer>().material.mainTexture = texture;
+			WWW www = new WWW (url + key);
+			yield return www;
+			Texture texture = www.texture;
+
+			//save texture
+			GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().map = texture;
+
+			transform.GetComponent<Renderer> ().material = material;
+			transform.GetComponent<Renderer> ().material.mainTexture = texture;
+
+
+		} else {
+			Texture texture = GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().map;
+			transform.GetComponent<Renderer> ().material = material;
+			transform.GetComponent<Renderer> ().material.mainTexture = texture;
+
+		}
+
 	}
 
 	//http://stackoverflow.com/questions/176137/java-convert-lat-lon-to-utm

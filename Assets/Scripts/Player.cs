@@ -31,7 +31,7 @@ public class Player : MonoBehaviour {
 
 		//move and animate
 		Vector3 pos = new Vector3 (-(easting_offset-easting), transform.position.y, -(northing_offset - northing));
-		transform.position = pos;
+		transform.position = Vector3.Lerp (transform.position, pos, Time.deltaTime * 20f);
 	}
 
 	void Update(){		

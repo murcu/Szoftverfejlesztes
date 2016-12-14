@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class DataManager : MonoBehaviour {
+
+	public Texture map = null;
+
 	//the current player
 	public CharacterData player;
 

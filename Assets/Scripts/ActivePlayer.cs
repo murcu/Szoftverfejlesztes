@@ -15,6 +15,8 @@ public class ActivePlayer : MonoBehaviour {
 
 	public bool combatMode = false;
 
+	private bool startRead = false;
+
 	// Use this for initialization
 	void Start () {
 		data = GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().player;
@@ -23,39 +25,48 @@ public class ActivePlayer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (combatMode) {
+			startRead = false;
+		}
+
 		if (!combatMode) {
 			int xPos_new = xPos;
 			int zPos_new = zPos;
 			int direction = -1;
+
 			if (Input.touchCount == 1) {
 				Touch touch = Input.GetTouch (0);
 
 				if (touch.phase == TouchPhase.Began) {
 					startPos = touch.position;
-				}else if (touch.phase == TouchPhase.Ended) {
+					startRead = true;
+				}
+				if (touch.phase == TouchPhase.Ended && startRead) {
 					endPos = touch.position;
-
 					float swipeDistVertical = (new Vector3 (0f, endPos.y, 0f) - new Vector3(0f, startPos.y, 0f)).magnitude;
 					float swipeDistHorizontal = (new Vector3(endPos.x, 0f, 0f) - new Vector3(startPos.x, 0f, 0f)).magnitude;
 
 					float swipDistance = (endPos - startPos).magnitude;
-
 					if (swipDistance > minSwipeDist) {
 						if (swipeDistVertical > swipeDistHorizontal) {
 							float swipeValue = Mathf.Sign (endPos.y - startPos.y);
 							if (swipeValue > 0) {//north
+								Debug.Log("up");
 								direction = 0;
 								zPos_new++;
 							} else {//south
+								Debug.Log("down");
 								direction = 2;
 								zPos_new--;
 							}
 						} else {
 							float swipeValue = Mathf.Sign (endPos.x - startPos.x);
 							if (swipeValue > 0) {//east
+								Debug.Log("right");
 								direction = 1;
 								xPos_new++;
 							} else {//west
+								Debug.Log("left");
 								direction = 3;
 								xPos_new--;
 							}
@@ -72,7 +83,13 @@ public class ActivePlayer : MonoBehaviour {
 
 					if (room.GetComponent<Room> ().doors [direction]) {
 						room = GameObject.Find (xPos + "_" + zPos);
-						transform.position = room.transform.position;
+
+						Vector3 relativePos = room.transform.FindChild ("PlayerPos").transform.position - transform.position;
+						Quaternion rotation = Quaternion.LookRotation (relativePos);
+
+						transform.FindChild ("MorphedHumanDoll").transform.rotation = rotation;
+						transform.position = room.transform.FindChild ("PlayerPos").transform.position;
+
 						//after movement check if movement is still possible
 						GameObject.Find ("ActiveDungeon").GetComponent<ActiveDungeon> ().openCloseRooms ();
 					}
@@ -98,5 +115,9 @@ public class ActivePlayer : MonoBehaviour {
 				GameObject.Find ("ActiveDungeon").GetComponent<ActiveDungeon> ().openCloseRooms ();
 			}
 		}
+	}
+
+	public void playerDefend(){
+		//defend the for next x seconds
 	}
 }

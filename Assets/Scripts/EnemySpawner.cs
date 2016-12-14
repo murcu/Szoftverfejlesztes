@@ -23,6 +23,9 @@ public class EnemySpawner : MonoBehaviour {
 			room.enemies = new GameObject[enemyCount];
 			for(int i = 0; i < enemyCount; i++){
 				GameObject enemy = Instantiate (enemies [enemyIndex].characterPrefab, room.transform) as GameObject;
+				enemy.transform.name = "Enemy_" + i;
+
+				enemy.GetComponent<Enemy> ().setData (enemies [enemyIndex], room.xPos, room.zPos);
 
 				enemy.transform.position = room.transform.position;
 				if (i > 0) {

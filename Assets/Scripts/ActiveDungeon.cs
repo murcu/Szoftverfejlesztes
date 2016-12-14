@@ -84,18 +84,30 @@ public class ActiveDungeon : MonoBehaviour {
 				case 0:
 					rooms [roomIndex].GetComponent<Room> ().doors [0] = rooms [roomIndex].transform.FindChild ("NorthDoor").gameObject;
 					rooms [i].GetComponent<Room> ().doors [2] = rooms [i].transform.FindChild ("SouthDoor").gameObject;
+
+					rooms [i].transform.FindChild ("PlayerPos").transform.position = new Vector3(0f, 0f, -3f) * roomScale;
+					rooms [i].transform.FindChild ("EnemyPos").transform.position = new Vector3(0f, 0f, 3f) * roomScale;
 					break;
 				case 1:
 					rooms [roomIndex].GetComponent<Room> ().doors [1] = rooms [roomIndex].transform.FindChild ("EastDoor").gameObject;
 					rooms [i].GetComponent<Room> ().doors [3] = rooms [i].transform.FindChild ("WestDoor").gameObject;
+
+					rooms [i].transform.FindChild ("PlayerPos").transform.position = new Vector3(-3f, 0f, 0f) * roomScale;
+					rooms [i].transform.FindChild ("EnemyPos").transform.position = new Vector3(3f, 0f, 0f) * roomScale;
 					break;
 				case 2:
 					rooms [roomIndex].GetComponent<Room> ().doors [2] = rooms [roomIndex].transform.FindChild ("SouthDoor").gameObject;
 					rooms [i].GetComponent<Room> ().doors [0] = rooms [i].transform.FindChild ("NorthDoor").gameObject;
+
+					rooms [i].transform.FindChild ("PlayerPos").transform.position = new Vector3(0f, 0f, 3f) * roomScale;
+					rooms [i].transform.FindChild ("EnemyPos").transform.position = new Vector3(0f, 0f, -3f) * roomScale;
 					break;
 				case 3:
 					rooms [roomIndex].GetComponent<Room> ().doors [3] = rooms [roomIndex].transform.FindChild ("WestDoor").gameObject;
 					rooms [i].GetComponent<Room> ().doors [1] = rooms [i].transform.FindChild ("EastDoor").gameObject;
+
+					rooms [i].transform.FindChild ("PlayerPos").transform.position = new Vector3(3f, 0f, 0f) * roomScale;
+					rooms [i].transform.FindChild ("EnemyPos").transform.position = new Vector3(-3f, 0f, 0f) * roomScale;
 					break;
 				}
 
