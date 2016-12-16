@@ -23,8 +23,6 @@ public class EnemySpawner : MonoBehaviour {
 			room.enemies = new GameObject[enemyCount];
 			for(int i = 0; i < enemyCount; i++){
 				GameObject enemy = Instantiate (enemies [enemyIndex].characterPrefab, room.transform) as GameObject;
-				enemy.transform.name = "Enemy_" + i;
-
 				enemy.GetComponent<Enemy> ().setData (enemies [enemyIndex], room.xPos, room.zPos);
 
 				enemy.transform.position = room.transform.position;
@@ -37,6 +35,7 @@ public class EnemySpawner : MonoBehaviour {
 		} else {//spawn a boos at the room
 			room.enemies = new GameObject[1];
 			GameObject enemy = Instantiate (bosses [0].characterPrefab, room.transform) as GameObject;
+			enemy.GetComponent<Enemy> ().setData (bosses [0], room.xPos, room.zPos);
 
 			enemy.transform.position = room.transform.position;
 			room.enemies [0] = enemy;

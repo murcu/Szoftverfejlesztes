@@ -36,6 +36,13 @@ public class ActiveDungeon : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		compeleteDungeon ();
+
+		ActivePlayer activePlayer = GameObject.Find ("Player").GetComponent<ActivePlayer> ();
+		Room currentRoom = GameObject.Find (activePlayer.xPos + "_" + activePlayer.zPos).GetComponent<Room>();
+
+		if (currentRoom.enemies.Length == 0) {
+			openCloseRooms ();
+		}
 	}
 
 	void buildDungeon(){
@@ -172,8 +179,15 @@ public class ActiveDungeon : MonoBehaviour {
 			if (bossRoom.enemies.Length == 0) {//there are no enemies left in the room
 				data.inProgress = false;
 				data.completed = true;
+
+				activePlayer.data.currHealth = activePlayer.data.maxHealth;
 				SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex -1);
 			}
+		}
+
+		if (activePlayer.data.currHealth <= 0) {
+			Debug.Log ("player dead");
+			SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex - 2);
 		}
 	}
 }

@@ -5,8 +5,10 @@ using System.Collections;
 public class ActivePlayer : MonoBehaviour {
 
 	public Text nameText;
+	public Text playerHp;
+	public Text playerCoin;
 
-	private CharacterData data;
+	public CharacterData data;
 
 	private Vector3 startPos;
 	private Vector3 endPos;
@@ -14,17 +16,25 @@ public class ActivePlayer : MonoBehaviour {
 	public int xPos, zPos;
 
 	public bool combatMode = false;
+	public bool defend = false;
 
 	private bool startRead = false;
+
+	Animator anim;
 
 	// Use this for initialization
 	void Start () {
 		data = GameObject.FindGameObjectWithTag ("data").GetComponent<DataManager> ().player;
 		nameText.text = data.characterName;
+
+		anim = transform.FindChild("MorphedHumanDoll").GetComponent<Animator> ();
 	}
 
 	// Update is called once per frame
 	void Update () {
+		playerHp.text = data.currHealth + " / " + data.maxHealth; 
+		playerCoin.text = data.points + "";
+
 		if (combatMode) {
 			startRead = false;
 		}
@@ -88,8 +98,11 @@ public class ActivePlayer : MonoBehaviour {
 						Quaternion rotation = Quaternion.LookRotation (relativePos);
 
 						transform.FindChild ("MorphedHumanDoll").transform.rotation = rotation;
+
+						anim.SetBool ("Moving", true);
 						transform.position = room.transform.FindChild ("PlayerPos").transform.position;
 
+						anim.SetBool ("Moving", false);
 						//after movement check if movement is still possible
 						GameObject.Find ("ActiveDungeon").GetComponent<ActiveDungeon> ().openCloseRooms ();
 					}
@@ -99,25 +112,27 @@ public class ActivePlayer : MonoBehaviour {
 	}
 
 	public void playerAttack(){
-		if (combatMode) {
+		if (combatMode && !defend) {
+			anim.Play ("Attack");
 			Room currentRoom = GameObject.Find (xPos + "_" + zPos).GetComponent<Room>();
 
-			GameObject[] alive = new GameObject[currentRoom.enemies.Length - 1];
+			Enemy currentEnemy = currentRoom.enemies [currentRoom.enemies.Length - 1].GetComponent<Enemy> ();
 
-			for (int i = 0; i < currentRoom.enemies.Length - 1; i++) {
-				alive [i] = currentRoom.enemies [i];
-			}
-
-			Destroy (currentRoom.enemies [currentRoom.enemies.Length - 1]);
-			currentRoom.enemies = alive;
-
-			if (currentRoom.enemies.Length == 0) {
-				GameObject.Find ("ActiveDungeon").GetComponent<ActiveDungeon> ().openCloseRooms ();
-			}
+			currentEnemy.HP -= 2;
 		}
+		anim.Play ("Idle");
 	}
 
 	public void playerDefend(){
-		//defend the for next x seconds
+		Debug.Log ("defend");
+		/*if (!defend) {
+			float startTime = Time.time;
+			defend = true;
+			Debug.Log (defend + " " + Time.time);
+			while (Time.time != startTime + 15) {
+			}
+			defend = false;
+			Debug.Log (defend + " " + Time.time);
+		}*/
 	}
 }

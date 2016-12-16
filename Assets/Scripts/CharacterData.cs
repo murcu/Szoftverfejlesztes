@@ -10,8 +10,5 @@ public class CharacterData : ScriptableObject {
 	public int maxHealth;
 	public int currHealth;
 
-	public int strenght;
-	public int agility;
-	public int intellect;
-
+	public int points;
 }
